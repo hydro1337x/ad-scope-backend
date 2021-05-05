@@ -1,10 +1,10 @@
 import { Controller, Get } from '@nestjs/common'
+import { AuthService } from './auth.service'
 import { User } from './entities/user.entity'
-import { UsersService } from './users.service'
 
-@Controller('users')
-export class UsersController {
-  constructor(private usersService: UsersService) {}
+@Controller('auth')
+export class AuthController {
+  constructor(private usersService: AuthService) {}
 
   @Get()
   createUser(): Promise<User> {
