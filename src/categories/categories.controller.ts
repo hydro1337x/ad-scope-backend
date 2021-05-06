@@ -5,7 +5,9 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe
 } from '@nestjs/common'
@@ -13,6 +15,7 @@ import { CreateCategoryDto } from './dto/create-category.dto'
 import { AdminJwtAuthGuard } from '../auth/guards/admin-jwt-auth-guard'
 import { Category } from './entities/category.entity'
 import { CategoriesService } from './categories.service'
+import { FileInterceptor } from '@nestjs/platform-express'
 
 @Controller('categories')
 export class CategoriesController {
@@ -21,10 +24,12 @@ export class CategoriesController {
   @Post()
   @UseGuards(AdminJwtAuthGuard)
   @UsePipes(ValidationPipe)
+  @UseInterceptors(FileInterceptor('image'))
   createCategory(
-    @Body() createCategoryDto: CreateCategoryDto
+    @Body() createCategoryDto: CreateCategoryDto,
+    @UploadedFile() file: Express.Multer.File
   ): Promise<Category> {
-    return this.categoriesService.createCategory(createCategoryDto)
+    return this.categoriesService.createCategory(createCategoryDto, file)
   }
 
   @Get()

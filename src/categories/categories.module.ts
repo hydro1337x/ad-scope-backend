@@ -3,9 +3,10 @@ import { CategoriesController } from './categories.controller'
 import { CategoriesService } from './categories.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { CategoriesRepository } from './categories.repository'
+import { FilesModule } from '../files/files.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CategoriesRepository])],
+  imports: [TypeOrmModule.forFeature([CategoriesRepository]), FilesModule],
   controllers: [CategoriesController],
   providers: [CategoriesService]
 })

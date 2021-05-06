@@ -1,18 +1,16 @@
 import { EntityRepository, Repository } from 'typeorm'
 import { Category } from './entities/category.entity'
 import { CreateCategoryDto } from './dto/create-category.dto'
+import { Image } from '../files/entities/image.entity'
 
 @EntityRepository(Category)
 export class CategoriesRepository extends Repository<Category> {
-  async createCategory(
-    createCategoryDto: CreateCategoryDto
-  ): Promise<Category> {
+  createCategory(createCategoryDto: CreateCategoryDto, image: Image): Category {
     const { title, description } = createCategoryDto
     const category = new Category()
     category.title = title
     category.description = description
-
-    await category.save()
+    category.media = image
 
     return category
   }

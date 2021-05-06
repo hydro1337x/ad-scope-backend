@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn
+} from 'typeorm'
+import { Image } from '../../files/entities/image.entity'
 
 @Entity()
 export class Category extends BaseEntity {
@@ -10,4 +18,8 @@ export class Category extends BaseEntity {
 
   @Column()
   description: string
+
+  @OneToOne(() => Image)
+  @JoinColumn()
+  media: Image
 }
