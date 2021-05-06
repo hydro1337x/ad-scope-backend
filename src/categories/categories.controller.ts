@@ -2,10 +2,10 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
-  UseFilters,
   UseGuards,
-  UseInterceptors,
   UsePipes,
   ValidationPipe
 } from '@nestjs/common'
@@ -13,8 +13,6 @@ import { CreateCategoryDto } from './dto/create-category.dto'
 import { AdminJwtAuthGuard } from '../auth/guards/admin-jwt-auth-guard'
 import { Category } from './entities/category.entity'
 import { CategoriesService } from './categories.service'
-import { TransformInterceptor } from '../global/interceptors/transform-interceptor'
-import { HttpExceptionFilter } from '../global/filters/http-exception-filter'
 
 @Controller('categories')
 export class CategoriesController {
@@ -32,5 +30,10 @@ export class CategoriesController {
   @Get()
   getCategories(): Promise<Category[]> {
     return this.categoriesService.getCategories()
+  }
+
+  @Get(':id')
+  getCategory(@Param('id', ParseIntPipe) id: number): Promise<Category> {
+    return this.categoriesService.getCategory(id)
   }
 }
