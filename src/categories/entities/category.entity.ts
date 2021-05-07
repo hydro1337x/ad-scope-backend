@@ -1,10 +1,12 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   OneToOne,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
 } from 'typeorm'
 import { Image } from '../../files/entities/image.entity'
 
@@ -18,6 +20,12 @@ export class Category extends BaseEntity {
 
   @Column()
   description: string
+
+  @CreateDateColumn()
+  createdAt: Date
+
+  @UpdateDateColumn()
+  updatedAt: Date
 
   @OneToOne(() => Image)
   @JoinColumn()

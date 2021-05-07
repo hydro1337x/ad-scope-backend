@@ -9,10 +9,13 @@ import { S3 } from 'aws-sdk'
 import { v4 as uuid } from 'uuid'
 import { ConfigService } from '@nestjs/config'
 import { ImageMimeType } from './enums/image-type.enum'
-import { CreateImageDto } from './dto/create-image.dto'
+import { ImageRequestDto } from './dto/image-request.dto'
 import { Image } from './entities/image.entity'
 import { ImagesRepository } from './images.repository'
 import { InjectRepository } from '@nestjs/typeorm'
+import { plainToClass } from 'class-transformer'
+import { AuthResponseDto } from '../auth/dto/auth-response.dto'
+import { ImageResponseDto } from './dto/image-response.dto'
 
 @Injectable()
 export class FilesService {
@@ -48,7 +51,7 @@ export class FilesService {
       throw new ConflictException('File upload failed')
     }
 
-    const createImageDto = new CreateImageDto()
+    const createImageDto = new ImageRequestDto()
     createImageDto.url = uploadResult.Location
     createImageDto.name = uploadResult.Key
 

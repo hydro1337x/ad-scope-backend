@@ -3,8 +3,9 @@ import { JwtPayload } from './interfaces/jwt-payload.interface'
 import { RegistrationCredentialsDto } from './dto/registration-credentials.dto'
 import { JwtService } from '@nestjs/jwt'
 import { User } from '../users/entities/user.entity'
-import { AuthenticatedUserDto } from './dto/authenticated-user.dto'
+import { AuthResponseDto } from './dto/auth-response.dto'
 import { UsersService } from '../users/users.service'
+import { plainToClass } from 'class-transformer'
 
 @Injectable()
 export class AuthService {
@@ -20,14 +21,16 @@ export class AuthService {
     return { message: 'Successfully registered' }
   }
 
-  async login(user: User): Promise<AuthenticatedUserDto> {
+  async login(user: User): Promise<AuthResponseDto> {
     const email = user.email
     const payload: JwtPayload = { email } // Add roles etc, but not sensitive information
     const accessToken = await this.jwtService.sign(payload)
 
-    const { password, salt, ...result } = user
-    let authenticatedUserDto = new AuthenticatedUserDto()
-    authenticatedUserDto = { ...result, accessToken }
+    const authenticatedUserDto = plainToClass(AuthResponseDto, user, {
+      excludeExtraneousValues: true
+    })
+
+    authenticatedUserDto.accessToken = accessToken
 
     return authenticatedUserDto
   }

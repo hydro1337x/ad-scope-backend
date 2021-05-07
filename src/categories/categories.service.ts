@@ -5,10 +5,12 @@ import {
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { CategoriesRepository } from './categories.repository'
-import { CreateCategoryDto } from './dto/create-category.dto'
+import { CategoryRequestDto } from './dto/category-request.dto'
 import { Category } from './entities/category.entity'
 import { Connection } from 'typeorm'
 import { FilesService } from '../files/files.service'
+import { CategoryResponseDto } from './dto/category-response.dto'
+import { plainToClass } from 'class-transformer'
 
 @Injectable()
 export class CategoriesService {
@@ -20,9 +22,9 @@ export class CategoriesService {
   ) {}
 
   async createCategory(
-    createCategoryDto: CreateCategoryDto,
+    createCategoryDto: CategoryRequestDto,
     file: Express.Multer.File
-  ): Promise<Category> {
+  ): Promise<CategoryResponseDto> {
     const queryRunner = this.connection.createQueryRunner()
     let createdCategory: Category
 
@@ -49,20 +51,44 @@ export class CategoriesService {
       await queryRunner.release()
     }
 
-    return createdCategory
+    const categoryResponseDto = plainToClass(
+      CategoryResponseDto,
+      createdCategory,
+      {
+        excludeExtraneousValues: true
+      }
+    )
+
+    return categoryResponseDto
   }
 
-  async getCategories(): Promise<Category[]> {
-    return await this.categoriesRepository.find()
+  async getCategories(): Promise<CategoryResponseDto[]> {
+    const categories = await this.categoriesRepository.find({
+      relations: ['media']
+    })
+    const categoriesResponseDto = plainToClass(
+      CategoryResponseDto,
+      categories,
+      {
+        excludeExtraneousValues: true
+      }
+    )
+
+    return categoriesResponseDto
   }
 
-  async getCategory(id: number): Promise<Category> {
-    const found = await this.categoriesRepository.findOne(id)
-
+  async getCategory(id: number): Promise<CategoryResponseDto> {
+    const found = await this.categoriesRepository.findOne(id, {
+      relations: ['media']
+    })
     if (!found) {
       throw new NotFoundException()
     }
 
-    return found
+    const categoryResponseDto = plainToClass(CategoryResponseDto, found, {
+      excludeExtraneousValues: true
+    })
+
+    return categoryResponseDto
   }
 }

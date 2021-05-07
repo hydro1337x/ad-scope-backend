@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { RegistrationCredentialsDto } from './dto/registration-credentials.dto'
-import { AuthenticatedUserDto } from './dto/authenticated-user.dto'
+import { AuthResponseDto } from './dto/auth-response.dto'
 import { LocalAuthGuard } from './guards/local-auth-guard'
 import { AdminJwtAuthGuard } from './guards/admin-jwt-auth-guard'
 
@@ -26,7 +26,7 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Request() request): Promise<AuthenticatedUserDto> {
+  login(@Request() request): Promise<AuthResponseDto> {
     return this.authService.login(request.user)
   }
 

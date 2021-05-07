@@ -1,10 +1,10 @@
 import { EntityRepository, Repository } from 'typeorm'
 import { Image } from './entities/image.entity'
-import { CreateImageDto } from './dto/create-image.dto'
+import { ImageRequestDto } from './dto/image-request.dto'
 
 @EntityRepository(Image)
 export class ImagesRepository extends Repository<Image> {
-  createImage(createImageDto: CreateImageDto): Image {
+  createImage(createImageDto: ImageRequestDto): Image {
     const { name, url } = createImageDto
     const image = new Image()
     image.name = name
