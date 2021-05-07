@@ -1,9 +1,9 @@
 import { IsNotEmpty } from 'class-validator'
 
-export class CategoryRequestDto {
+export class CreateImageRequestDto {
   @IsNotEmpty()
-  title: string
+  name: string
 
   @IsNotEmpty()
-  description: string
+  url: string
 }

@@ -5,12 +5,13 @@ import {
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { CategoriesRepository } from './categories.repository'
-import { CategoryRequestDto } from './dto/category-request.dto'
+import { CreateCategoryRequestDto } from './dto/create-category-request.dto'
 import { Category } from './entities/category.entity'
 import { Connection } from 'typeorm'
 import { FilesService } from '../files/files.service'
-import { CategoryResponseDto } from './dto/category-response.dto'
+import { CreateCategoryResponseDto } from './dto/create-category-response.dto'
 import { plainToClass } from 'class-transformer'
+import { UpdateCategoryRequestDto } from './dto/update-category-request.dto'
 
 @Injectable()
 export class CategoriesService {
@@ -22,9 +23,9 @@ export class CategoriesService {
   ) {}
 
   async createCategory(
-    createCategoryDto: CategoryRequestDto,
+    createCategoryDto: CreateCategoryRequestDto,
     file: Express.Multer.File
-  ): Promise<CategoryResponseDto> {
+  ): Promise<CreateCategoryResponseDto> {
     const queryRunner = this.connection.createQueryRunner()
     let createdCategory: Category
 
@@ -52,7 +53,7 @@ export class CategoriesService {
     }
 
     const categoryResponseDto = plainToClass(
-      CategoryResponseDto,
+      CreateCategoryResponseDto,
       createdCategory,
       {
         excludeExtraneousValues: true
@@ -62,12 +63,12 @@ export class CategoriesService {
     return categoryResponseDto
   }
 
-  async getCategories(): Promise<CategoryResponseDto[]> {
+  async getCategories(): Promise<CreateCategoryResponseDto[]> {
     const categories = await this.categoriesRepository.find({
       relations: ['media']
     })
     const categoriesResponseDto = plainToClass(
-      CategoryResponseDto,
+      CreateCategoryResponseDto,
       categories,
       {
         excludeExtraneousValues: true
@@ -77,18 +78,91 @@ export class CategoriesService {
     return categoriesResponseDto
   }
 
-  async getCategory(id: number): Promise<CategoryResponseDto> {
-    const found = await this.categoriesRepository.findOne(id, {
+  async getCategory(id: number): Promise<CreateCategoryResponseDto> {
+    const category = await this.categoriesRepository.findOne(id, {
       relations: ['media']
     })
-    if (!found) {
+    if (!category) {
       throw new NotFoundException()
     }
 
-    const categoryResponseDto = plainToClass(CategoryResponseDto, found, {
-      excludeExtraneousValues: true
-    })
+    const categoryResponseDto = plainToClass(
+      CreateCategoryResponseDto,
+      category,
+      {
+        excludeExtraneousValues: true
+      }
+    )
 
     return categoryResponseDto
+  }
+
+  async updateCategory(
+    id: number,
+    updateCategoryRequestDto: UpdateCategoryRequestDto,
+    file: Express.Multer.File
+  ) {
+    const category = await this.categoriesRepository.findOne(id, {
+      relations: ['media']
+    })
+
+    if (!category) {
+      throw new NotFoundException('Can not find category for updating')
+    }
+
+    const queryRunner = this.connection.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+
+    Object.entries(updateCategoryRequestDto).forEach((entry) => {
+      const [key, value] = entry
+      if (value != null) {
+        console.log('categoryKey: ', category[key])
+        console.log('value: ', value)
+        category[key] = value
+      }
+    })
+
+    let imageNameForDeletion: string
+
+    try {
+      if (file) {
+        const image = await this.filesService.uploadImage(file)
+        const imageForDeletion = category.media
+        imageNameForDeletion = category.media.name
+        category.media = image
+        await queryRunner.manager.save(image)
+        await queryRunner.manager.save(category)
+        await queryRunner.manager.remove(imageForDeletion)
+      } else {
+        await queryRunner.manager.save(category)
+      }
+
+      await queryRunner.commitTransaction()
+    } catch (error) {
+      await queryRunner.rollbackTransaction()
+      throw new ConflictException(error.message)
+    } finally {
+      await queryRunner.release()
+    }
+
+    if (imageNameForDeletion) {
+      await this.filesService.deleteRemoteImage(imageNameForDeletion)
+    }
+  }
+
+  async deleteCategory(id: number) {
+    const category = await this.categoriesRepository.findOne(id, {
+      relations: ['media']
+    })
+
+    if (!category) {
+      throw new NotFoundException('Category not found')
+    }
+
+    await this.filesService.deleteRemoteImage(category.media.name)
+    const imageForDeletion = category.media
+    await this.categoriesRepository.remove(category)
+    await this.filesService.removeLocalImage(imageForDeletion)
   }
 }

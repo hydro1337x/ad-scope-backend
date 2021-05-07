@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
   UnsupportedMediaTypeException
 } from '@nestjs/common'
 import * as AWS from 'aws-sdk'
@@ -9,13 +10,13 @@ import { S3 } from 'aws-sdk'
 import { v4 as uuid } from 'uuid'
 import { ConfigService } from '@nestjs/config'
 import { ImageMimeType } from './enums/image-type.enum'
-import { ImageRequestDto } from './dto/image-request.dto'
+import { CreateImageRequestDto } from './dto/create-image-request.dto'
 import { Image } from './entities/image.entity'
 import { ImagesRepository } from './images.repository'
 import { InjectRepository } from '@nestjs/typeorm'
 import { plainToClass } from 'class-transformer'
 import { AuthResponseDto } from '../auth/dto/auth-response.dto'
-import { ImageResponseDto } from './dto/image-response.dto'
+import { CreateImageResponseDto } from './dto/create-image-response.dto'
 
 @Injectable()
 export class FilesService {
@@ -51,10 +52,23 @@ export class FilesService {
       throw new ConflictException('File upload failed')
     }
 
-    const createImageDto = new ImageRequestDto()
+    const createImageDto = new CreateImageRequestDto()
     createImageDto.url = uploadResult.Location
     createImageDto.name = uploadResult.Key
 
     return this.imagesRepository.createImage(createImageDto)
+  }
+
+  async deleteRemoteImage(name: string) {
+    const deletionParams = {
+      Bucket: this.configService.get('AWS_S3_BUCKET_NAME'),
+      Key: name
+    }
+
+    await this.s3.deleteObject(deletionParams).promise()
+  }
+
+  async removeLocalImage(image: Image) {
+    await this.imagesRepository.remove(image)
   }
 }

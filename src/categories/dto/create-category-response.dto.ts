@@ -1,7 +1,7 @@
 import { Expose, plainToClass, Transform, Type } from 'class-transformer'
-import { ImageResponseDto } from '../../files/dto/image-response.dto'
+import { CreateImageResponseDto } from '../../files/dto/create-image-response.dto'
 
-export class CategoryResponseDto {
+export class CreateCategoryResponseDto {
   @Expose()
   id: number
 
@@ -20,6 +20,6 @@ export class CategoryResponseDto {
   updatedAt: number
 
   @Expose()
-  @Type(() => ImageResponseDto)
-  media: ImageResponseDto
+  @Type(() => CreateImageResponseDto)
+  media: CreateImageResponseDto
 }
