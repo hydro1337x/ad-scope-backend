@@ -71,6 +71,7 @@ export class CategoriesService {
     const categories = await this.categoriesRepository.getCategories(
       filterCategoryRequestDto
     )
+
     const categoriesResponseDto = plainToClass(
       CategoryResponseDto,
       categories,
@@ -97,6 +98,14 @@ export class CategoriesService {
     return categoryResponseDto
   }
 
+  async findOne(id: number): Promise<Category | undefined> {
+    const category = await this.categoriesRepository.findOne(id, {
+      relations: ['media', 'ads']
+    })
+
+    return category
+  }
+
   async updateCategory(
     id: number,
     updateCategoryRequestDto: UpdateCategoryRequestDto,
@@ -109,7 +118,7 @@ export class CategoriesService {
     }
 
     const category = await this.categoriesRepository.findOne(id, {
-      relations: ['media']
+      relations: ['media', 'ads']
     })
 
     if (!category) {
@@ -154,7 +163,7 @@ export class CategoriesService {
 
   async deleteCategory(id: number) {
     const category = await this.categoriesRepository.findOne(id, {
-      relations: ['media']
+      relations: ['media', 'ads']
     })
 
     if (!category) {

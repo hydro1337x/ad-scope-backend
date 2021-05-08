@@ -4,24 +4,27 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  OneToMany,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
+import { Category } from '../../categories/entities/category.entity'
 import { Image } from '../../files/entities/image.entity'
-import { Ad } from '../../ads/entities/ad.entity'
 
 @Entity()
-export class Category extends BaseEntity {
+export class Ad extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ unique: true })
+  @Column()
   title: string
 
   @Column()
   description: string
+
+  @Column({ type: 'float8' })
+  price: number
 
   @CreateDateColumn()
   createdAt: Date
@@ -29,8 +32,8 @@ export class Category extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date
 
-  @OneToMany(() => Ad, (ad) => ad.category)
-  ads: Ad[]
+  @ManyToOne(() => Category, (category) => category.ads)
+  category: Category
 
   @OneToOne(() => Image)
   @JoinColumn()

@@ -20,7 +20,7 @@ export class UsersService {
     return await this.usersRepository.findOne({ email })
   }
 
-  async createOne(
+  async createUser(
     registrationCredentialsDto: RegistrationCredentialsDto
   ): Promise<void> {
     return await this.usersRepository.createOne(registrationCredentialsDto)

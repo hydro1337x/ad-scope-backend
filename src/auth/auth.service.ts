@@ -17,7 +17,7 @@ export class AuthService {
   async register(
     registrationCredentialsDto: RegistrationCredentialsDto
   ): Promise<{ message: string }> {
-    await this.usersService.createOne(registrationCredentialsDto)
+    await this.usersService.createUser(registrationCredentialsDto)
     return { message: 'Successfully registered' }
   }
 

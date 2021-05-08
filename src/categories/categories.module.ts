@@ -8,6 +8,7 @@ import { FilesModule } from '../files/files.module'
 @Module({
   imports: [TypeOrmModule.forFeature([CategoriesRepository]), FilesModule],
   controllers: [CategoriesController],
-  providers: [CategoriesService]
+  providers: [CategoriesService],
+  exports: [CategoriesService]
 })
 export class CategoriesModule {}

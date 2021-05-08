@@ -5,8 +5,4 @@ export class UpdateUserRequestDto {
   @IsOptional()
   @IsIn([UserRole.USER, UserRole.ADMIN])
   role: UserRole
-
-  @IsOptional()
-  @IsNotEmpty()
-  firstname: string
 }
