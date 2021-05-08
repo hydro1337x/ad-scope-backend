@@ -77,12 +77,26 @@ export class AdsService {
   ): Promise<AdResponseDto[]> {
     const ads = await this.adsRepository.getAds(filterAdRequestDto)
 
-    console.log(ads)
-
     const adsResponseDto = plainToClass(AdResponseDto, ads, {
       excludeExtraneousValues: true
     })
 
     return adsResponseDto
+  }
+
+  async getAd(id: number): Promise<AdResponseDto> {
+    const ad = await this.adsRepository.findOne(id, {
+      relations: ['media', 'category']
+    })
+
+    if (!ad) {
+      throw new NotFoundException('Ad not found')
+    }
+
+    const adResponseDto = plainToClass(AdResponseDto, ad, {
+      excludeExtraneousValues: true
+    })
+
+    return adResponseDto
   }
 }

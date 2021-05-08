@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
   Query,
   UploadedFile,
@@ -37,5 +39,10 @@ export class AdsController {
     @Query(ValidationPipe) filterAdRequestDto: FilterAdRequestDto
   ): Promise<AdResponseDto[]> {
     return this.adsService.getAds(filterAdRequestDto)
+  }
+
+  @Get(':id')
+  getAd(@Param('id', ParseIntPipe) id: number): Promise<AdResponseDto> {
+    return this.adsService.getAd(id)
   }
 }
