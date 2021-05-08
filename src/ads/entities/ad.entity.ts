@@ -32,7 +32,9 @@ export class Ad extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date
 
-  @ManyToOne(() => Category, (category) => category.ads)
+  @ManyToOne(() => Category, (category) => category.ads, {
+    onDelete: 'CASCADE'
+  })
   category: Category
 
   @OneToOne(() => Image)

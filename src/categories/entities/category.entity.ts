@@ -29,7 +29,7 @@ export class Category extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date
 
-  @OneToMany(() => Ad, (ad) => ad.category)
+  @OneToMany(() => Ad, (ad) => ad.category, { cascade: true })
   ads: Ad[]
 
   @OneToOne(() => Image)

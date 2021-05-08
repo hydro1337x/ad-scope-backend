@@ -111,9 +111,9 @@ export class CategoriesService {
     updateCategoryRequestDto: UpdateCategoryRequestDto,
     file: Express.Multer.File
   ) {
-    const values = classToPlain(updateCategoryRequestDto)
+    const { title, description } = updateCategoryRequestDto
 
-    if (Object.keys(values).length === 0 && !file) {
+    if (!title && !description && !file) {
       throw new BadRequestException('At least one field must not be empty')
     }
 
@@ -129,8 +129,12 @@ export class CategoriesService {
     await queryRunner.connect()
     await queryRunner.startTransaction()
 
-    for (const key in values) {
-      category[key] = values[key]
+    if (title) {
+      category.title = title
+    }
+
+    if (description) {
+      category.description = description
     }
 
     let imageNameForDeletion: string
