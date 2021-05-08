@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
-import { UserRole } from '../enums/user-role.enum'
+import { UserRole } from '../enum/user-role.enum'
 import * as bcrypt from 'bcrypt'
 
 @Entity()

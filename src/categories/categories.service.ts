@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException
@@ -10,7 +11,7 @@ import { Category } from './entities/category.entity'
 import { Connection } from 'typeorm'
 import { FilesService } from '../files/files.service'
 import { CategoryResponseDto } from './dto/category-response.dto'
-import { plainToClass } from 'class-transformer'
+import { classToPlain, plainToClass } from 'class-transformer'
 import { UpdateCategoryRequestDto } from './dto/update-category-request.dto'
 import { FilterCategoryRequestDto } from './dto/filter-category-request.dto'
 
@@ -101,6 +102,12 @@ export class CategoriesService {
     updateCategoryRequestDto: UpdateCategoryRequestDto,
     file: Express.Multer.File
   ) {
+    const values = classToPlain(updateCategoryRequestDto)
+
+    if (Object.keys(values).length === 0 && !file) {
+      throw new BadRequestException('At least one field must not be empty')
+    }
+
     const category = await this.categoriesRepository.findOne(id, {
       relations: ['media']
     })
@@ -113,14 +120,9 @@ export class CategoriesService {
     await queryRunner.connect()
     await queryRunner.startTransaction()
 
-    Object.entries(updateCategoryRequestDto).forEach((entry) => {
-      const [key, value] = entry
-      if (value != null) {
-        console.log('categoryKey: ', category[key])
-        console.log('value: ', value)
-        category[key] = value
-      }
-    })
+    for (const key in values) {
+      category[key] = values[key]
+    }
 
     let imageNameForDeletion: string
 

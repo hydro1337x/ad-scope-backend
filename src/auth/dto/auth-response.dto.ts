@@ -1,4 +1,4 @@
-import { UserRole } from '../../users/enums/user-role.enum'
+import { UserRole } from '../../users/enum/user-role.enum'
 import { Expose } from 'class-transformer'
 
 export class AuthResponseDto {

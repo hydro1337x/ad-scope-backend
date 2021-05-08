@@ -54,7 +54,7 @@ export class CategoriesController {
 
   @Patch(':id')
   @UseGuards(AdminJwtAuthGuard)
-  @UsePipes(ValidationPipe)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
   @UseInterceptors(FileInterceptor('image'))
   updateCategory(
     @Param('id', ParseIntPipe) id: number,
