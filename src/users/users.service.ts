@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { RegistrationCredentialsDto } from '../auth/dto/registration-credentials.dto'
 import { UpdateUserRequestDto } from './dto/update-user-request.dto'
 import { classToPlain } from 'class-transformer'
+import { UserRole } from './enum/user-role.enum'
 
 @Injectable()
 export class UsersService {
@@ -45,5 +46,21 @@ export class UsersService {
     }
 
     await this.usersRepository.save(user)
+  }
+
+  async deleteUser(id: number, user: User) {
+    const userForDeletion = await this.usersRepository.findOne(id, {
+      relations: ['ads']
+    })
+
+    if (!userForDeletion) {
+      throw new NotFoundException('User not found')
+    }
+
+    if (userForDeletion.id !== user.id && user.role !== UserRole.ADMIN) {
+      throw new BadRequestException()
+    }
+
+    await this.usersRepository.remove(userForDeletion)
   }
 }
