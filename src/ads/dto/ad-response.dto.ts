@@ -1,4 +1,3 @@
-import { Image } from '../../files/entities/image.entity'
 import { Expose, Transform, Type } from 'class-transformer'
 import { CreateImageResponseDto } from '../../files/dto/create-image-response.dto'
 

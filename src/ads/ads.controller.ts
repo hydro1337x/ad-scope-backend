@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -13,6 +15,7 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { AdsService } from './ads.service'
 import { UserJwtAuthGuard } from '../auth/guards/user-jwt-auth-guard'
 import { AdResponseDto } from './dto/ad-response.dto'
+import { FilterAdRequestDto } from './dto/filter-ad-request.dto'
 
 @Controller('ads')
 export class AdsController {
@@ -27,5 +30,12 @@ export class AdsController {
     @UploadedFile() file: Express.Multer.File
   ): Promise<AdResponseDto> {
     return this.adsService.createAd(createAdRequestDto, file)
+  }
+
+  @Get()
+  getAds(
+    @Query(ValidationPipe) filterAdRequestDto: FilterAdRequestDto
+  ): Promise<AdResponseDto[]> {
+    return this.adsService.getAds(filterAdRequestDto)
   }
 }

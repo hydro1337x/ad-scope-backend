@@ -1,0 +1,6 @@
+export enum AdOrderType {
+  PRICE_LOW_HIGH = 'PRICE_LOW_HIGH',
+  PRICE_HIGH_LOW = 'PRICE_HIGH_LOW',
+  DATE_ASC = 'DATE_ASC',
+  DATE_DESC = 'DATE_DESC'
+}

@@ -13,6 +13,8 @@ import { FilesService } from '../files/files.service'
 import { plainToClass } from 'class-transformer'
 import { CategoryResponseDto } from '../categories/dto/category-response.dto'
 import { AdResponseDto } from './dto/ad-response.dto'
+import { FilterAdRequestDto } from './dto/filter-ad-request.dto'
+import { filter } from 'rxjs/operators'
 
 @Injectable()
 export class AdsService {
@@ -68,5 +70,19 @@ export class AdsService {
     })
 
     return adResponseDto
+  }
+
+  async getAds(
+    filterAdRequestDto: FilterAdRequestDto
+  ): Promise<AdResponseDto[]> {
+    const ads = await this.adsRepository.getAds(filterAdRequestDto)
+
+    console.log(ads)
+
+    const adsResponseDto = plainToClass(AdResponseDto, ads, {
+      excludeExtraneousValues: true
+    })
+
+    return adsResponseDto
   }
 }
