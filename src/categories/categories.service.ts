@@ -9,9 +9,10 @@ import { CreateCategoryRequestDto } from './dto/create-category-request.dto'
 import { Category } from './entities/category.entity'
 import { Connection } from 'typeorm'
 import { FilesService } from '../files/files.service'
-import { CreateCategoryResponseDto } from './dto/create-category-response.dto'
+import { CategoryResponseDto } from './dto/category-response.dto'
 import { plainToClass } from 'class-transformer'
 import { UpdateCategoryRequestDto } from './dto/update-category-request.dto'
+import { FilterCategoryRequestDto } from './dto/filter-category-request.dto'
 
 @Injectable()
 export class CategoriesService {
@@ -25,7 +26,7 @@ export class CategoriesService {
   async createCategory(
     createCategoryDto: CreateCategoryRequestDto,
     file: Express.Multer.File
-  ): Promise<CreateCategoryResponseDto> {
+  ): Promise<CategoryResponseDto> {
     const queryRunner = this.connection.createQueryRunner()
     let createdCategory: Category
 
@@ -53,7 +54,7 @@ export class CategoriesService {
     }
 
     const categoryResponseDto = plainToClass(
-      CreateCategoryResponseDto,
+      CategoryResponseDto,
       createdCategory,
       {
         excludeExtraneousValues: true
@@ -63,12 +64,14 @@ export class CategoriesService {
     return categoryResponseDto
   }
 
-  async getCategories(): Promise<CreateCategoryResponseDto[]> {
-    const categories = await this.categoriesRepository.find({
-      relations: ['media']
-    })
+  async getCategories(
+    filterCategoryRequestDto: FilterCategoryRequestDto
+  ): Promise<CategoryResponseDto[]> {
+    const categories = await this.categoriesRepository.getCategories(
+      filterCategoryRequestDto
+    )
     const categoriesResponseDto = plainToClass(
-      CreateCategoryResponseDto,
+      CategoryResponseDto,
       categories,
       {
         excludeExtraneousValues: true
@@ -78,7 +81,7 @@ export class CategoriesService {
     return categoriesResponseDto
   }
 
-  async getCategory(id: number): Promise<CreateCategoryResponseDto> {
+  async getCategory(id: number): Promise<CategoryResponseDto> {
     const category = await this.categoriesRepository.findOne(id, {
       relations: ['media']
     })
@@ -86,13 +89,9 @@ export class CategoriesService {
       throw new NotFoundException()
     }
 
-    const categoryResponseDto = plainToClass(
-      CreateCategoryResponseDto,
-      category,
-      {
-        excludeExtraneousValues: true
-      }
-    )
+    const categoryResponseDto = plainToClass(CategoryResponseDto, category, {
+      excludeExtraneousValues: true
+    })
 
     return categoryResponseDto
   }

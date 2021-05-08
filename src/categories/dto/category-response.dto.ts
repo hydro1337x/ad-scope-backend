@@ -1,7 +1,7 @@
 import { Expose, plainToClass, Transform, Type } from 'class-transformer'
 import { CreateImageResponseDto } from '../../files/dto/create-image-response.dto'
 
-export class CreateCategoryResponseDto {
+export class CategoryResponseDto {
   @Expose()
   id: number
 
