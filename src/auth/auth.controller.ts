@@ -12,6 +12,7 @@ import { RegistrationCredentialsDto } from './dto/registration-credentials.dto'
 import { AuthResponseDto } from './dto/auth-response.dto'
 import { LocalAuthGuard } from './guards/local-auth-guard'
 import { AdminJwtAuthGuard } from './guards/admin-jwt-auth-guard'
+import { GetUser } from './decorators/get-user.decorator'
 
 @Controller('auth')
 export class AuthController {
@@ -26,8 +27,8 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Request() request): Promise<AuthResponseDto> {
-    return this.authService.login(request.user)
+  login(@GetUser() user): Promise<AuthResponseDto> {
+    return this.authService.login(user)
   }
 
   @UseGuards(AdminJwtAuthGuard)

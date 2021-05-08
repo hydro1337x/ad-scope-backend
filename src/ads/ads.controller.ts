@@ -21,6 +21,8 @@ import { UserJwtAuthGuard } from '../auth/guards/user-jwt-auth-guard'
 import { AdResponseDto } from './dto/ad-response.dto'
 import { FilterAdRequestDto } from './dto/filter-ad-request.dto'
 import { UpdateAdRequestDto } from './dto/update-ad-request.dto'
+import { GetUser } from '../auth/decorators/get-user.decorator'
+import { User } from '../users/entities/user.entity'
 
 @Controller('ads')
 export class AdsController {
@@ -31,9 +33,10 @@ export class AdsController {
   @UseInterceptors(FileInterceptor('image'))
   createAd(
     @Body(ValidationPipe) createAdRequestDto: CreateAdRequestDto,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFile() file: Express.Multer.File,
+    @GetUser() user
   ): Promise<AdResponseDto> {
-    return this.adsService.createAd(createAdRequestDto, file)
+    return this.adsService.createAd(createAdRequestDto, file, user)
   }
 
   @Get()
@@ -55,14 +58,15 @@ export class AdsController {
   updateAd(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateAdRequestDto: UpdateAdRequestDto,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFile() file: Express.Multer.File,
+    @GetUser() user: User
   ) {
-    return this.adsService.updateAd(id, updateAdRequestDto, file)
+    return this.adsService.updateAd(id, updateAdRequestDto, file, user)
   }
 
   @Delete(':id')
   @UseGuards(UserJwtAuthGuard)
-  deleteAd(@Param('id', ParseIntPipe) id: number) {
-    return this.adsService.deleteAd(id)
+  deleteAd(@Param('id', ParseIntPipe) id: number, @GetUser() user: User) {
+    return this.adsService.deleteAd(id, user)
   }
 }

@@ -17,7 +17,7 @@ export class UsersService {
   ) {}
 
   async findOne(email: string): Promise<User | undefined> {
-    return await this.usersRepository.findOne({ email })
+    return await this.usersRepository.findOne({ email }, { relations: ['ads'] })
   }
 
   async createUser(

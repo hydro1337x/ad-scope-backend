@@ -11,11 +11,12 @@ import { CategoriesService } from '../categories/categories.service'
 import { Ad } from './entities/ad.entity'
 import { Connection } from 'typeorm'
 import { FilesService } from '../files/files.service'
-import { classToPlain, plainToClass } from 'class-transformer'
+import { plainToClass } from 'class-transformer'
 import { AdResponseDto } from './dto/ad-response.dto'
 import { FilterAdRequestDto } from './dto/filter-ad-request.dto'
 import { UpdateAdRequestDto } from './dto/update-ad-request.dto'
-import { Category } from '../categories/entities/category.entity'
+import { User } from '../users/entities/user.entity'
+import { UserRole } from '../users/enum/user-role.enum'
 
 @Injectable()
 export class AdsService {
@@ -29,7 +30,8 @@ export class AdsService {
 
   async createAd(
     createAdRequestDto: CreateAdRequestDto,
-    file: Express.Multer.File
+    file: Express.Multer.File,
+    user: User
   ): Promise<AdResponseDto> {
     const { categoryId } = createAdRequestDto
 
@@ -50,6 +52,7 @@ export class AdsService {
       const ad = this.adsRepository.createAd(
         createAdRequestDto,
         category,
+        user,
         image
       )
 
@@ -104,7 +107,8 @@ export class AdsService {
   async updateAd(
     id: number,
     updateAdRequestDto: UpdateAdRequestDto,
-    file: Express.Multer.File
+    file: Express.Multer.File,
+    user: User
   ) {
     const { title, description, price, categoryId } = updateAdRequestDto
 
@@ -113,11 +117,16 @@ export class AdsService {
     }
 
     const ad = await this.adsRepository.findOne(id, {
-      relations: ['media', 'category']
+      relations: ['media', 'category', 'user']
     })
 
     if (!ad) {
       throw new NotFoundException('Ad not found')
+    }
+
+    if (ad.user.id !== user.id && user.role !== UserRole.ADMIN) {
+      console.log(user.role)
+      throw new BadRequestException()
     }
 
     const queryRunner = this.connection.createQueryRunner()
@@ -172,13 +181,18 @@ export class AdsService {
     }
   }
 
-  async deleteAd(id: number) {
+  async deleteAd(id: number, user: User) {
     const ad = await this.adsRepository.findOne(id, {
-      relations: ['media', 'category']
+      relations: ['media', 'category', 'user']
     })
 
     if (!ad) {
       throw new NotFoundException('Ad not found')
+    }
+
+    if (ad.user.id !== user.id && user.role !== UserRole.ADMIN) {
+      console.log(user.role)
+      throw new BadRequestException()
     }
 
     await this.filesService.deleteRemoteImage(ad.media.name)

@@ -5,12 +5,14 @@ import { Category } from '../categories/entities/category.entity'
 import { CreateAdRequestDto } from './dto/create-ad-request.dto'
 import { FilterAdRequestDto } from './dto/filter-ad-request.dto'
 import { AdOrderType } from './enum/ad-order-type.enum'
+import { User } from '../users/entities/user.entity'
 
 @EntityRepository(Ad)
 export class AdsRepository extends Repository<Ad> {
   createAd(
     createAdRequestDto: CreateAdRequestDto,
     category: Category,
+    user: User,
     image: Image
   ): Ad {
     const { title, description, price } = createAdRequestDto
@@ -19,6 +21,7 @@ export class AdsRepository extends Repository<Ad> {
     ad.description = description
     ad.price = price
     ad.category = category
+    ad.user = user
     ad.media = image
 
     return ad

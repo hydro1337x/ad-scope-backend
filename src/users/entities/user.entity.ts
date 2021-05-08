@@ -3,11 +3,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
 import { UserRole } from '../enum/user-role.enum'
 import * as bcrypt from 'bcrypt'
+import { Ad } from '../../ads/entities/ad.entity'
 
 @Entity()
 export class User extends BaseEntity {
@@ -37,6 +39,9 @@ export class User extends BaseEntity {
 
   @UpdateDateColumn()
   updatedAt: Date
+
+  @OneToMany(() => Ad, (ad) => ad.user, { cascade: true })
+  ads: Ad[]
 
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt)

@@ -11,6 +11,7 @@ import {
 } from 'typeorm'
 import { Category } from '../../categories/entities/category.entity'
 import { Image } from '../../files/entities/image.entity'
+import { User } from '../../users/entities/user.entity'
 
 @Entity()
 export class Ad extends BaseEntity {
@@ -36,6 +37,11 @@ export class Ad extends BaseEntity {
     onDelete: 'CASCADE'
   })
   category: Category
+
+  @ManyToOne(() => User, (user) => user.ads, {
+    onDelete: 'CASCADE'
+  })
+  user: User
 
   @OneToOne(() => Image)
   @JoinColumn()
