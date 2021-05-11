@@ -14,7 +14,7 @@ import { ConfigModule } from '@nestjs/config'
       useFactory: () => ({
         secret: process.env.APP_SECRET,
         signOptions: {
-          expiresIn: 3600
+          expiresIn: +process.env.JWT_EXPIRATION
         }
       })
     }),

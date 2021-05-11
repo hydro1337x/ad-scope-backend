@@ -7,6 +7,7 @@ export class UserJwtAuthGuard extends AuthGuard('jwt') {
   authorizedRoles: UserRole[] = [UserRole.USER, UserRole.ADMIN]
 
   handleRequest(err, user, info) {
+    console.log(user.role)
     // You can throw an exception based on either "info" or "err" arguments
     if (!this.authorizedRoles.includes(user.role)) {
       throw new UnauthorizedException()

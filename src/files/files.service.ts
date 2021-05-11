@@ -21,6 +21,9 @@ import { CreateImageResponseDto } from './dto/create-image-response.dto'
 @Injectable()
 export class FilesService {
   private s3: S3
+  private readonly awsAccessKeyId: string
+  private readonly awsSecretAccessKey: string
+  private readonly awsBucketName: string
 
   constructor(
     @InjectRepository(ImagesRepository)
@@ -28,9 +31,13 @@ export class FilesService {
     private configService: ConfigService
   ) {
     this.s3 = new AWS.S3()
+    this.awsAccessKeyId = configService.get('AWS_ACCESS_KEY_ID')
+    this.awsSecretAccessKey = configService.get('AWS_SECRET_ACCESS_KEY')
+    this.awsBucketName = configService.get('AWS_S3_BUCKET_NAME')
+
     AWS.config.update({
-      accessKeyId: configService.get<string>('AWS_ACCESS_KEY_ID'),
-      secretAccessKey: configService.get<string>('AWS_SECRET_ACCESS_KEY')
+      accessKeyId: this.awsAccessKeyId,
+      secretAccessKey: this.awsSecretAccessKey
     })
   }
 
@@ -40,7 +47,7 @@ export class FilesService {
     }
 
     const params = {
-      Bucket: this.configService.get('AWS_S3_BUCKET_NAME'),
+      Bucket: this.awsBucketName,
       Body: file.buffer,
       Key: `${uuid()}-${file.originalname}`,
       ACL: 'public-read'
@@ -61,7 +68,7 @@ export class FilesService {
 
   async deleteRemoteImage(name: string) {
     const deletionParams = {
-      Bucket: this.configService.get('AWS_S3_BUCKET_NAME'),
+      Bucket: this.awsBucketName,
       Key: name
     }
 
