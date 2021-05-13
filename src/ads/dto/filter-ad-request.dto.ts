@@ -21,4 +21,9 @@ export class FilterAdRequestDto {
   @IsInt()
   @Transform((value) => Number.parseInt(value.value))
   categoryId: number
+
+  @IsOptional()
+  @IsInt()
+  @Transform((value) => Number.parseInt(value.value))
+  userId: number
 }

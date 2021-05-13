@@ -19,6 +19,10 @@ export class AdResponseDto {
   categoryId: number
 
   @Expose()
+  @Transform((data) => data.obj.user.id)
+  userId: number
+
+  @Expose()
   @Type(() => CreateImageResponseDto)
   media: CreateImageResponseDto
 

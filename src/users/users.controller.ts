@@ -20,7 +20,6 @@ import { User } from './entities/user.entity'
 import { ApiBearerAuth } from '@nestjs/swagger'
 import { UpdateUserRoleRequestDto } from './dto/update-user-role-request.dto'
 import { UserResponseDto } from './dto/user-response.dto'
-import { FilterCategoryRequestDto } from '../categories/dto/filter-category-request.dto'
 import { FilterUserRequestDto } from './dto/filter-user-request.dto'
 
 @Controller('users')

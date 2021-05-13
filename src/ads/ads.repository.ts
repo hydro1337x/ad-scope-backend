@@ -28,12 +28,16 @@ export class AdsRepository extends Repository<Ad> {
   }
 
   async getAds(filterAdRequestDto: FilterAdRequestDto): Promise<Ad[]> {
-    const { search, order, categoryId } = filterAdRequestDto
+    const { search, order, categoryId, userId } = filterAdRequestDto
 
     const query = this.createQueryBuilder('ad')
 
     if (categoryId) {
       query.where('ad.categoryId = :categoryId', { categoryId: categoryId })
+    }
+
+    if (userId) {
+      query.where('ad.userId = :userId', { userId: userId })
     }
 
     if (search) {
@@ -62,6 +66,7 @@ export class AdsRepository extends Repository<Ad> {
     const ads = await query
       .leftJoinAndSelect('ad.media', 'image')
       .leftJoinAndSelect('ad.category', 'category')
+      .leftJoinAndSelect('ad.user', 'user')
       .getMany()
 
     return ads
