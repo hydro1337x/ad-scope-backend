@@ -13,6 +13,8 @@ import { AuthResponseDto } from './dto/auth-response.dto'
 import { LocalAuthGuard } from './guards/local-auth-guard'
 import { AdminJwtAuthGuard } from './guards/admin-jwt-auth-guard'
 import { GetUser } from './decorators/get-user.decorator'
+import { ApiBody } from '@nestjs/swagger'
+import { LoginCredentialsDto } from './dto/login-credentials.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -25,15 +27,15 @@ export class AuthController {
     return this.authService.register(registrationCredentialsDto)
   }
 
+  @ApiBody({
+    type: LoginCredentialsDto
+  })
+  /**
+   * @documentation
+   */
   @UseGuards(LocalAuthGuard)
   @Post('login')
   login(@GetUser() user): Promise<AuthResponseDto> {
     return this.authService.login(user)
-  }
-
-  @UseGuards(AdminJwtAuthGuard)
-  @Get()
-  fakeFunction() {
-    return 'Authorized'
   }
 }

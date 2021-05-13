@@ -12,6 +12,7 @@ async function bootstrap() {
     .setTitle('AdScope')
     .setDescription('API Docs')
     .setVersion('1.0')
+    .addBearerAuth({ in: 'header', type: 'http' })
     .build()
 
   const document = SwaggerModule.createDocument(app, config)

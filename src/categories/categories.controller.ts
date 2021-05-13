@@ -16,18 +16,41 @@ import {
 } from '@nestjs/common'
 import { CreateCategoryRequestDto } from './dto/create-category-request.dto'
 import { AdminJwtAuthGuard } from '../auth/guards/admin-jwt-auth-guard'
-import { Category } from './entities/category.entity'
 import { CategoriesService } from './categories.service'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { CategoryResponseDto } from './dto/category-response.dto'
 import { UpdateCategoryRequestDto } from './dto/update-category-request.dto'
 import { FilterCategoryRequestDto } from './dto/filter-category-request.dto'
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiHeader } from '@nestjs/swagger'
+import { ApiImplicitFile } from '@nestjs/swagger/dist/decorators/api-implicit-file.decorator'
 
 @Controller('categories')
 export class CategoriesController {
   constructor(private categoriesService: CategoriesService) {}
 
-  @Post()
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string'
+        },
+        description: {
+          type: 'string'
+        },
+        image: {
+          type: 'string',
+          format: 'binary'
+        }
+      }
+    }
+  })
+  /**
+   * @documentation
+   */
+  @Post('create')
   @UseGuards(AdminJwtAuthGuard)
   @UsePipes(ValidationPipe)
   @UseInterceptors(FileInterceptor('image'))
@@ -52,7 +75,29 @@ export class CategoriesController {
     return this.categoriesService.getCategory(id)
   }
 
-  @Patch(':id')
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string'
+        },
+        description: {
+          type: 'string'
+        },
+        image: {
+          type: 'string',
+          format: 'binary'
+        }
+      }
+    }
+  })
+  /**
+   * @documentation
+   */
+  @Patch(':id/update')
   @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
   @UseInterceptors(FileInterceptor('image'))
@@ -68,6 +113,11 @@ export class CategoriesController {
     )
   }
 
+  /**
+   */
+  @ApiBearerAuth()
+  /**
+   */
   @Delete(':id')
   @UseGuards(AdminJwtAuthGuard)
   deleteCategory(@Param('id', ParseIntPipe) id: number) {

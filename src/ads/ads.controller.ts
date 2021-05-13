@@ -23,12 +23,43 @@ import { FilterAdRequestDto } from './dto/filter-ad-request.dto'
 import { UpdateAdRequestDto } from './dto/update-ad-request.dto'
 import { GetUser } from '../auth/decorators/get-user.decorator'
 import { User } from '../users/entities/user.entity'
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiExtraModels,
+  getSchemaPath
+} from '@nestjs/swagger'
 
+/**
+ */
+@ApiExtraModels(CreateAdRequestDto, UpdateAdRequestDto)
+/**
+ */
 @Controller('ads')
 export class AdsController {
   constructor(private readonly adsService: AdsService) {}
 
-  @Post()
+  /**
+   */
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      allOf: [{ $ref: getSchemaPath(CreateAdRequestDto) }],
+      required: ['image'],
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary'
+        }
+      }
+    }
+  })
+  /**
+   */
+  @Post('create')
   @UseGuards(UserJwtAuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   createAd(
@@ -51,7 +82,28 @@ export class AdsController {
     return this.adsService.getAd(id)
   }
 
-  @Patch(':id')
+  /**
+   */
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      allOf: [
+        {
+          $ref: getSchemaPath(UpdateAdRequestDto)
+        }
+      ],
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary'
+        }
+      }
+    }
+  })
+  /**
+   */
+  @Patch(':id/update')
   @UseGuards(UserJwtAuthGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
   @UseInterceptors(FileInterceptor('image'))
@@ -64,7 +116,12 @@ export class AdsController {
     return this.adsService.updateAd(id, updateAdRequestDto, file, user)
   }
 
-  @Delete(':id')
+  /**
+   */
+  @ApiBearerAuth()
+  /**
+   */
+  @Delete(':id/delete')
   @UseGuards(UserJwtAuthGuard)
   deleteAd(@Param('id', ParseIntPipe) id: number, @GetUser() user: User) {
     return this.adsService.deleteAd(id, user)

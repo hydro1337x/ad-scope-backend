@@ -15,11 +15,17 @@ import { AdminJwtAuthGuard } from '../auth/guards/admin-jwt-auth-guard'
 import { UserJwtAuthGuard } from '../auth/guards/user-jwt-auth-guard'
 import { GetUser } from '../auth/decorators/get-user.decorator'
 import { User } from './entities/user.entity'
+import { ApiBearerAuth } from '@nestjs/swagger'
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  /**
+   */
+  @ApiBearerAuth()
+  /**
+   */
   @Patch(':id')
   @UseGuards(AdminJwtAuthGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
@@ -30,6 +36,11 @@ export class UsersController {
     return this.usersService.updateUser(id, updateUserRequestDto)
   }
 
+  /**
+   */
+  @ApiBearerAuth()
+  /**
+   */
   @Delete(':id')
   @UseGuards(UserJwtAuthGuard)
   deleteUser(@Param('id', ParseIntPipe) id: number, @GetUser() user: User) {
