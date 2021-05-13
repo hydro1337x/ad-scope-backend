@@ -7,20 +7,12 @@ import { FilesModule } from './files/files.module'
 import { ConfigModule } from '@nestjs/config'
 import { AdsModule } from './ads/ads.module'
 import * as Joi from '@hapi/joi'
+import { TypeOrmConfigService } from './config/type-orm-config.service'
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      useFactory: () => ({
-        type: 'postgres',
-        host: process.env.DATABASE_HOST,
-        port: +process.env.DATABASE_PORT,
-        username: process.env.DATABASE_USER,
-        password: process.env.DATABASE_PASSWORD,
-        database: process.env.DATABASE_NAME,
-        autoLoadEntities: true,
-        synchronize: true // Remove for production
-      })
+      useClass: TypeOrmConfigService
     }),
     ConfigModule.forRoot({
       validationSchema: Joi.object({
