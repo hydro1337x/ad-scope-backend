@@ -2,9 +2,11 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   ParseIntPipe,
   Patch,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe
@@ -17,6 +19,9 @@ import { GetUser } from '../auth/decorators/get-user.decorator'
 import { User } from './entities/user.entity'
 import { ApiBearerAuth } from '@nestjs/swagger'
 import { UpdateUserRoleRequestDto } from './dto/update-user-role-request.dto'
+import { UserResponseDto } from './dto/user-response.dto'
+import { FilterCategoryRequestDto } from '../categories/dto/filter-category-request.dto'
+import { FilterUserRequestDto } from './dto/filter-user-request.dto'
 
 @Controller('users')
 export class UsersController {
@@ -35,6 +40,13 @@ export class UsersController {
     @Body() updateUserRoleRequestDto: UpdateUserRoleRequestDto
   ) {
     return this.usersService.updateUserRole(id, updateUserRoleRequestDto)
+  }
+
+  @Get()
+  getUsers(
+    @Query(ValidationPipe) filterUserRequestDto: FilterUserRequestDto
+  ): Promise<UserResponseDto[]> {
+    return this.usersService.getUsers(filterUserRequestDto)
   }
 
   /**

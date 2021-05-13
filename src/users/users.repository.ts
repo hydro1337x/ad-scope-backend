@@ -6,9 +6,22 @@ import { RegistrationCredentialsDto } from '../auth/dto/registration-credentials
 import { UserRole } from './enum/user-role.enum'
 import { UpdateUserRequestDto } from './dto/update-user-request.dto'
 import { last } from 'rxjs/operators'
+import { FilterUserRequestDto } from './dto/filter-user-request.dto'
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
+  async getUsers(filterUserRequestDto: FilterUserRequestDto): Promise<User[]> {
+    const { search } = filterUserRequestDto
+    const query = this.createQueryBuilder('user')
+    if (search) {
+      query.where(
+        '(user.firstname LIKE :search OR user.lastname LIKE :search OR user.email LIKE :search)',
+        { search: `%${search}%` }
+      )
+    }
+    return await query.getMany()
+  }
+
   async createOne(
     registrationCredentialsDto: RegistrationCredentialsDto
   ): Promise<void> {

@@ -22,7 +22,6 @@ import { CategoryResponseDto } from './dto/category-response.dto'
 import { UpdateCategoryRequestDto } from './dto/update-category-request.dto'
 import { FilterCategoryRequestDto } from './dto/filter-category-request.dto'
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiHeader } from '@nestjs/swagger'
-import { ApiImplicitFile } from '@nestjs/swagger/dist/decorators/api-implicit-file.decorator'
 
 @Controller('categories')
 export class CategoriesController {

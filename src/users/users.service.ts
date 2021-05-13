@@ -13,6 +13,7 @@ import { UpdateUserRoleRequestDto } from './dto/update-user-role-request.dto'
 import { UserResponseDto } from './dto/user-response.dto'
 import { plainToClass } from 'class-transformer'
 import { AuthResponseDto } from '../auth/dto/auth-response.dto'
+import { FilterUserRequestDto } from './dto/filter-user-request.dto'
 
 @Injectable()
 export class UsersService {
@@ -28,6 +29,18 @@ export class UsersService {
     registrationCredentialsDto: RegistrationCredentialsDto
   ): Promise<void> {
     return await this.usersRepository.createOne(registrationCredentialsDto)
+  }
+
+  async getUsers(
+    filterUserRequestDto: FilterUserRequestDto
+  ): Promise<UserResponseDto[]> {
+    const users = await this.usersRepository.getUsers(filterUserRequestDto)
+
+    const userResponseDtos = plainToClass(UserResponseDto, users, {
+      excludeExtraneousValues: true
+    })
+
+    return userResponseDtos
   }
 
   async updateUserRole(
