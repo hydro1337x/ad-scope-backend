@@ -16,6 +16,7 @@ import { UserJwtAuthGuard } from '../auth/guards/user-jwt-auth-guard'
 import { GetUser } from '../auth/decorators/get-user.decorator'
 import { User } from './entities/user.entity'
 import { ApiBearerAuth } from '@nestjs/swagger'
+import { UpdateUserRoleRequestDto } from './dto/update-user-role-request.dto'
 
 @Controller('users')
 export class UsersController {
@@ -26,14 +27,30 @@ export class UsersController {
   @ApiBearerAuth()
   /**
    */
-  @Patch(':id')
+  @Patch(':id/role/update')
   @UseGuards(AdminJwtAuthGuard)
+  @UsePipes(new ValidationPipe())
+  updateUserRole(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUserRoleRequestDto: UpdateUserRoleRequestDto
+  ) {
+    return this.usersService.updateUserRole(id, updateUserRoleRequestDto)
+  }
+
+  /**
+   */
+  @ApiBearerAuth()
+  /**
+   */
+  @Patch(':id/update')
+  @UseGuards(UserJwtAuthGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
   updateUser(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserRequestDto: UpdateUserRequestDto
+    @Body() updateUserRequestDto: UpdateUserRequestDto,
+    @GetUser() user: User
   ) {
-    return this.usersService.updateUser(id, updateUserRequestDto)
+    this.usersService.updateUser(id, updateUserRequestDto, user)
   }
 
   /**

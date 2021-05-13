@@ -125,7 +125,6 @@ export class AdsService {
     }
 
     if (ad.user.id !== user.id && user.role !== UserRole.ADMIN) {
-      console.log(user.role)
       throw new BadRequestException()
     }
 

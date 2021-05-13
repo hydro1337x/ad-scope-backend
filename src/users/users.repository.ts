@@ -4,6 +4,8 @@ import { ConflictException, InternalServerErrorException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { RegistrationCredentialsDto } from '../auth/dto/registration-credentials.dto'
 import { UserRole } from './enum/user-role.enum'
+import { UpdateUserRequestDto } from './dto/update-user-request.dto'
+import { last } from 'rxjs/operators'
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
@@ -29,6 +31,34 @@ export class UsersRepository extends Repository<User> {
         throw new InternalServerErrorException() // Unexpected error, case not handeled
       }
     }
+  }
+
+  async updateUser(
+    updateUserRequestDto: UpdateUserRequestDto,
+    user: User
+  ): Promise<User> {
+    const { firstname, lastname, password, email } = updateUserRequestDto
+
+    if (firstname) {
+      user.firstname = firstname
+    }
+
+    if (lastname) {
+      user.lastname = lastname
+    }
+
+    if (email) {
+      user.email = email
+    }
+
+    if (password) {
+      user.salt = await bcrypt.genSalt()
+      user.password = await this.hashPassword(password, user.salt)
+    }
+
+    await user.save()
+
+    return user
   }
 
   async hashPassword(password: string, salt: string): Promise<string> {

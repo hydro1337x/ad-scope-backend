@@ -8,8 +8,11 @@ import { UsersRepository } from './users.repository'
 import { InjectRepository } from '@nestjs/typeorm'
 import { RegistrationCredentialsDto } from '../auth/dto/registration-credentials.dto'
 import { UpdateUserRequestDto } from './dto/update-user-request.dto'
-import { classToPlain } from 'class-transformer'
 import { UserRole } from './enum/user-role.enum'
+import { UpdateUserRoleRequestDto } from './dto/update-user-role-request.dto'
+import { UserResponseDto } from './dto/user-response.dto'
+import { plainToClass } from 'class-transformer'
+import { AuthResponseDto } from '../auth/dto/auth-response.dto'
 
 @Injectable()
 export class UsersService {
@@ -27,25 +30,53 @@ export class UsersService {
     return await this.usersRepository.createOne(registrationCredentialsDto)
   }
 
-  async updateUser(id: number, updateUserRequestDto: UpdateUserRequestDto) {
-    console.log(updateUserRequestDto)
-    const values = classToPlain(updateUserRequestDto)
-
-    if (Object.keys(values).length === 0) {
-      throw new BadRequestException('At least one field must not be empty')
-    }
-
+  async updateUserRole(
+    id: number,
+    updateUserRoleRequestDto: UpdateUserRoleRequestDto
+  ) {
+    const { role } = updateUserRoleRequestDto
     const user = await this.usersRepository.findOne(id)
 
     if (!user) {
       throw new NotFoundException('User does not exist')
     }
 
-    for (const key in values) {
-      user[key] = values[key]
-    }
+    user.role = role
 
     await this.usersRepository.save(user)
+  }
+
+  async updateUser(
+    id: number,
+    updateUserRequestDto: UpdateUserRequestDto,
+    user: User
+  ): Promise<UserResponseDto> {
+    const { firstname, lastname, email, password } = updateUserRequestDto
+
+    if (!firstname && !lastname && !email && !password) {
+      throw new BadRequestException('At least one field must not be empty')
+    }
+
+    if (user.role !== UserRole.ADMIN && user.id !== id) {
+      throw new BadRequestException()
+    }
+
+    const foundUser = await this.usersRepository.findOne(id)
+
+    if (!foundUser) {
+      throw new NotFoundException()
+    }
+
+    const updatedUser = await this.usersRepository.updateUser(
+      updateUserRequestDto,
+      foundUser
+    )
+
+    const userResponseDto = plainToClass(UserResponseDto, updatedUser, {
+      excludeExtraneousValues: true
+    })
+
+    return userResponseDto
   }
 
   async deleteUser(id: number, user: User) {
