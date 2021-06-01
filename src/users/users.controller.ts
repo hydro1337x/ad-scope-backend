@@ -41,6 +41,17 @@ export class UsersController {
     return this.usersService.updateUserRole(id, updateUserRoleRequestDto)
   }
 
+  /**
+   */
+  @ApiBearerAuth()
+  /**
+   */
+  @Get('me')
+  @UseGuards(UserJwtAuthGuard)
+  getCurrentUser(@GetUser() user: User): UserResponseDto {
+    return this.usersService.formatCurrentUserResponse(user)
+  }
+
   @Get()
   getUsers(
     @Query(ValidationPipe) filterUserRequestDto: FilterUserRequestDto

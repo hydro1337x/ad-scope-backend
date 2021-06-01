@@ -4,14 +4,12 @@ import {
   Request,
   Post,
   ValidationPipe,
-  UseGuards,
-  Get
+  UseGuards
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { RegistrationCredentialsDto } from './dto/registration-credentials.dto'
 import { AuthResponseDto } from './dto/auth-response.dto'
 import { LocalAuthGuard } from './guards/local-auth-guard'
-import { AdminJwtAuthGuard } from './guards/admin-jwt-auth-guard'
 import { GetUser } from './decorators/get-user.decorator'
 import { ApiBody } from '@nestjs/swagger'
 import { LoginCredentialsDto } from './dto/login-credentials.dto'

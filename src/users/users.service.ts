@@ -43,6 +43,13 @@ export class UsersService {
     return userResponseDtos
   }
 
+  formatCurrentUserResponse(user: User): UserResponseDto {
+    const userResponseDto = plainToClass(UserResponseDto, user, {
+      excludeExtraneousValues: true
+    })
+    return userResponseDto
+  }
+
   async updateUserRole(
     id: number,
     updateUserRoleRequestDto: UpdateUserRoleRequestDto
