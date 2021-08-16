@@ -90,12 +90,14 @@ export class AdsService {
 
   async getAd(id: number): Promise<AdResponseDto> {
     const ad = await this.adsRepository.findOne(id, {
-      relations: ['media', 'category']
+      relations: ['media', 'category', 'user']
     })
 
     if (!ad) {
       throw new NotFoundException('Ad not found')
     }
+
+    console.log('Ad: ', ad)
 
     const adResponseDto = plainToClass(AdResponseDto, ad, {
       excludeExtraneousValues: true

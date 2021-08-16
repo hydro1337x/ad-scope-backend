@@ -15,11 +15,17 @@ export class AdResponseDto {
   price: number
 
   @Expose()
-  @Transform((data) => data.obj.category.id)
+  @Transform((data) => {
+    console.log('Category Transform: ', data)
+    data.obj.category.id
+  })
   categoryId: number
 
   @Expose()
-  @Transform((data) => data.obj.user.id)
+  @Transform((data) => {
+    console.log('User Transform: ', data)
+    data.obj.user.id
+  })
   userId: number
 
   @Expose()
